@@ -5,8 +5,8 @@
 #include <Windows.h>
 
 #include <memory>
-#include <iostream>
 
+#pragma warning(disable: 4189)
 #ifdef _DEBUG
 int main(void)
 {
@@ -16,5 +16,5 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 #endif
 
-	return !SeedEngine::Initialize<MainScene>() || !SeedEngine::Run() || SeedEngine::Finalize();
+	!SeedEngine::Initialize<MainScene>() || !SeedEngine::Run() || SeedEngine::Finalize();
 }
