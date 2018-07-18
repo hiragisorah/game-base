@@ -86,11 +86,11 @@ namespace ECS
 			}
 			const RefPtr<_Type> & operator=(RefPtr<_Type> & ref)
 			{
-				if (this->original_ != ref->original_)
+				if (this->original_ != ref.original_)
 				{
 					this->Release();
 
-					this->original_ = ref->original_;
+					this->original_ = ref.original_;
 					this->original_->ref_list_.emplace_back(this);
 				}
 

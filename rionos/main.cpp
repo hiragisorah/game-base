@@ -6,6 +6,9 @@
 
 #include <memory>
 
+#include <vector>
+#include <iostream>
+
 #pragma warning(disable: 4189)
 #ifdef _DEBUG
 int main(void)
