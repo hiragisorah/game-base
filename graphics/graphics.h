@@ -6,13 +6,20 @@
 #define GRAPHICS_DLL_API __declspec(dllimport)
 #endif
 
+#include "..\window\window.h"
+
 class GRAPHICS_DLL_API Graphics
 {
-private:
-	Graphics(void) {};
+public:
+	Graphics(Window * const window);
+	~Graphics(void);
 
 public:
-	static bool Initalize(void);
-	static bool Run(void);
-	static bool Finalize(void);
+	bool Initalize(void);
+	bool Run(void);
+	bool Finalize(void);
+
+private:
+	class Impl;
+	Impl * impl_;
 };
