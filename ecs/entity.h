@@ -18,17 +18,22 @@ namespace ECS
 		Utility::RefPtr<Entity> parent_;
 
 	public:
-		void set_parent(Utility::OriginalPtr<Entity> & parent);
 		void set_parent(Utility::RefPtr<Entity> & parent);
 		const Utility::RefPtr<Entity> & get_parent(void) const;
 
 		// Žq
 	private:
-		std::vector<Utility::OriginalPtr<Entity>> children_;
+		std::vector<Utility::OriPtr<Entity>*> children_;
 		
 	public:
-		void add_child(Utility::OriginalPtr<Entity> & child);
-		void add_child(Utility::RefPtr<Entity> & child);
+		template<class _Entity, class ... Args> Utility::OriPtr<Entity> & create_child(const Args &... args)
+		{
+			this->children_.emplace_back(new Utility::OriPtr<Entity>);
+
+			this->children_.back()->make<_Entity>(args ...);
+
+			return *this->children_.back();
+		}
 
 	private:
 		void UpdateComponents(void);

@@ -7,10 +7,8 @@ namespace ECS
 	}
 	Entity::~Entity(void)
 	{
-	}
-	void Entity::set_parent(Utility::OriginalPtr<Entity>& parent)
-	{
-		this->parent_ = parent;
+		for (auto & child : this->children_)
+			delete child;
 	}
 	void Entity::set_parent(Utility::RefPtr<Entity>& parent)
 	{
@@ -19,15 +17,6 @@ namespace ECS
 	const Utility::RefPtr<Entity> & Entity::get_parent(void) const
 	{
 		return this->parent_;
-	}
-	void Entity::add_child(Utility::OriginalPtr<Entity>& child)
-	{
-		child->set_parent(this->self_);
-		this->children_.emplace_back(child);
-	}
-	void Entity::add_child(Utility::RefPtr<Entity>& child)
-	{
-		child.safe()->set_parent(this->self_);
 	}
 	void Entity::UpdateComponents(void)
 	{

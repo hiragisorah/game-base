@@ -20,7 +20,6 @@ namespace ECS
 		virtual void Finalize(void) {}
 
 	public:
-		void set_owner(Utility::OriginalPtr<Entity> & owner);
 		void set_owner(Utility::RefPtr<Entity> & owner);
 		const Utility::RefPtr<Entity> & get_owner(void) const;
 	};

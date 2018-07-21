@@ -7,101 +7,146 @@ namespace ECS
 {
 	namespace Utility
 	{
-		template<class _Type> class RefPtr;
+		class IRefPtr;
 
-		template<class _Type> class OriginalPtr final
+		class IOriPtr
 		{
-			friend RefPtr<_Type>;
+			friend IRefPtr;
 
-		public:
-			template<class ... Args> OriginalPtr(const Args &... args)
-				: ptr_(args ...)
-			{}
-			~OriginalPtr(void)
+		protected:
+			IOriPtr(void)
+				: ptr_(nullptr)
 			{
-				for (auto & ref : this->ref_list_)
-					ref->original_ = nullptr;
-			}
-			
-		private:
-			std::vector<RefPtr<_Type>*> ref_list_;
 
-		private:
-			_Type ptr_;
-
-		public:
-			_Type * const operator->(void)
-			{
-				return &this->ptr_;
 			}
+			virtual ~IOriPtr(void);
+
+		protected:
+			void * ptr_;
+
+		protected:
+			std::vector<IRefPtr*> ref_list_;
+
+		protected:
+			void CleanRefs(void);
 		};
 
-		template<class _Type> class RefPtr final
+		class IRefPtr
 		{
-			friend OriginalPtr<_Type>;
+			friend IOriPtr;
 
-		public:
-			RefPtr(void)
+		protected:
+			IRefPtr(void)
 				: original_(nullptr)
 			{
 
 			}
-			RefPtr(OriginalPtr<_Type> * const original)
+			IRefPtr(IOriPtr * const original)
 				: original_(original)
 			{
 				this->original_->ref_list_.emplace_back(this);
 			}
-			RefPtr(OriginalPtr<_Type> & original)
-				: original_(&original)
-			{
-				this->original_->ref_list_.emplace_back(this);
-			}
-			~RefPtr(void)
-			{
-				this->Release();
-			}
-
-		private:
-			void Release(void)
+			virtual ~IRefPtr(void)
 			{
 				if (this->original_)
 				{
-					auto & vct = this->original_->ref_list_;
-					vct.erase(std::remove_if(vct.begin(), vct.end(), [&](RefPtr<_Type> * a) { return a == this; }), vct.end());
+					auto & data = this->original_->ref_list_;
+					std::remove_if(data.begin(), data.end(), [&](IRefPtr * ref)
+					{
+						return ref == this;
+					}
+					);
 				}
 			}
+			void set_original(IOriPtr * const original)
+			{
+				this->original_ = original;
+				this->original_->ref_list_.emplace_back(this);
+			}
 
-		private:
-			OriginalPtr<_Type> * original_;
+		protected:
+			IOriPtr * original_;
+		};
+
+		template<class _Type> class OriPtr final : public IOriPtr
+		{
+		public:
+			~OriPtr(void)
+			{
+				delete static_cast<_Type*>(this->ptr_);
+			}
 
 		public:
-			const RefPtr<_Type> & operator=(OriginalPtr<_Type> & original)
+			_Type * const operator->(void)
 			{
-				this->Release();
-
-				this->original_ = &original;
-				this->original_->ref_list_.emplace_back(this);
-
-				return *this;
+				return static_cast<_Type*>(this->ptr_);
 			}
-			const RefPtr<_Type> & operator=(RefPtr<_Type> & ref)
+			_Type * const operator*(void)
 			{
-				if (this->original_ != ref.original_)
-				{
-					this->Release();
+				return static_cast<_Type*>(this->ptr_);
+			}
 
-					this->original_ = ref.original_;
-					this->original_->ref_list_.emplace_back(this);
+		public:
+			template<class _NewType = _Type, class ... Args> void make(const Args &... args)
+			{
+				if (this->ptr_)
+				{
+					delete this->ptr_;
+				}
+				this->ptr_ = new _NewType(args ...);
+			}
+			void remove(void)
+			{
+				if (this->ptr_)
+				{
+					delete static_cast<_Type*>(this->ptr_);
+					this->ptr_ = nullptr;
 				}
 
+				this->CleanRefs();
+			}
+		};
+
+		template<class _Type> class RefPtr final : public IRefPtr
+		{
+		public:
+			RefPtr(void)
+			{
+			}
+			template<class _NewType> RefPtr(const OriPtr<_NewType> & original)
+				: IRefPtr(&original)
+			{
+				static_cast<_Type*>(*original);
+			}
+
+		public:
+			const bool is_connected(void)
+			{
+				return this->original_;
+			}
+
+		public:
+			_Type * const operator->(void)
+			{
+				return *(*static_cast<OriPtr<_Type>*>(this->original_));
+			}
+			IOriPtr * const operator*(void)
+			{
+				return this->original_;
+			}
+			template<class _NewType> const RefPtr<_Type> & operator=(OriPtr<_NewType> & original)
+			{
+				static_cast<_Type*>(*original);
+
+				this->set_original(&original);
+
 				return *this;
 			}
-			_Type * const safe(void)
+			template<class _NewType> const RefPtr<_Type> & operator=(const RefPtr<_NewType> & ref)
 			{
-				if (this->original_)
-					return &this->original_->ptr_;
-				else
-					return nullptr;
+				static_cast<_Type*>(*ref.original);
+
+				this->set_original(&ref.original);
 			}
 		};
 	}
