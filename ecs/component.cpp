@@ -10,10 +10,19 @@ namespace ECS
 	Component::~Component(void)
 	{
 	}
-	void Component::set_owner(Utility::RefPtr<Entity>& owner)
+	void Component::OnAdd(void)
 	{
-		this->owner_ = owner;
-		//this->owner_
+	}
+	void Component::OnUpdate(void)
+	{
+	}
+	void Component::OnRemove(void)
+	{
+	}
+	void Component::remove(void)
+	{
+		this->OnRemove();
+		(*this->self_)->remove();
 	}
 	const Utility::RefPtr<Entity>& Component::get_owner(void) const
 	{

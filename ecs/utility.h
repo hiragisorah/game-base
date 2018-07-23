@@ -19,7 +19,11 @@ namespace ECS
 			{
 
 			}
-			virtual ~IOriPtr(void);
+			IOriPtr(IOriPtr * const original);
+			virtual ~IOriPtr(void) noexcept;
+
+		public:
+			virtual void remove(void) = 0;
 
 		protected:
 			void * ptr_;
@@ -71,9 +75,16 @@ namespace ECS
 		template<class _Type> class OriPtr final : public IOriPtr
 		{
 		public:
+			OriPtr(void) {}
+			OriPtr(IOriPtr * const original)
+				: IOriPtr(original)
+			{
+
+			}
 			~OriPtr(void)
 			{
-				delete static_cast<_Type*>(this->ptr_);
+				if(this->ptr_)
+					delete static_cast<_Type*>(this->ptr_);
 			}
 
 		public:
@@ -113,7 +124,7 @@ namespace ECS
 			RefPtr(void)
 			{
 			}
-			template<class _NewType> RefPtr(const OriPtr<_NewType> & original)
+			template<class _NewType> RefPtr(OriPtr<_NewType> & original)
 				: IRefPtr(&original)
 			{
 				static_cast<_Type*>(*original);

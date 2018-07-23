@@ -5,22 +5,28 @@
 namespace ECS
 {
 	class Entity;
+
 	class Component
 	{
+		friend Entity;
+
 	public:
 		Component(void);
 		virtual ~Component(void);
 
 	private:
+		Utility::RefPtr<Component> self_;
 		Utility::RefPtr<Entity> owner_;
 
 	public:
-		virtual void Initialize(void) {}
-		virtual void Update(void) {}
-		virtual void Finalize(void) {}
+		virtual void OnAdd(void);
+		virtual void OnUpdate(void);
+		virtual void OnRemove(void);
 
 	public:
-		void set_owner(Utility::RefPtr<Entity> & owner);
+		void remove(void);
+
+	public:
 		const Utility::RefPtr<Entity> & get_owner(void) const;
 	};
 }

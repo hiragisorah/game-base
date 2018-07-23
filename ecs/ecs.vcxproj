@@ -21,15 +21,11 @@
   <ItemGroup>
     <ClInclude Include="component.h" />
     <ClInclude Include="entity.h" />
-    <ClInclude Include="scene.h" />
-    <ClInclude Include="system.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="component.cpp" />
     <ClCompile Include="entity.cpp" />
-    <ClCompile Include="scene.cpp" />
-    <ClCompile Include="system.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

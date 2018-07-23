@@ -1,37 +1,40 @@
 #include "seed-engine.h"
 
-namespace
-{
-	ECS::Scene * current_scene_ = nullptr;
-}
-
 Graphics * SeedEngine::graphics_ = nullptr;
 Window * SeedEngine::window_ = nullptr;
+ECS::Utility::OriPtr<ECS::Entity> * SeedEngine::current_scene_;
+ECS::Utility::OriPtr<ECS::Entity> * SeedEngine::next_scene_;
 
 SeedEngine::SeedEngine()
 {
 }
 
-const bool SeedEngine::Initialize(ECS::Scene * start_scene)
+const bool SeedEngine::Initialize(void)
 {
 	window_ = new Window;
 	graphics_ = new Graphics(window_);
-	current_scene_ = start_scene;
 	return window_->Initalize("Rionos", 1280U, 720U) && graphics_->Initalize();
 }
-
+void SeedEngine::Ready(void)
+{
+	current_scene_ = new ECS::Utility::OriPtr<ECS::Entity>;
+	next_scene_ = new ECS::Utility::OriPtr<ECS::Entity>;
+}
 const bool SeedEngine::Run()
 {
-	while (window_->Run() && graphics_->Run());
+	(*current_scene_)->set_self(*current_scene_);
+	(*current_scene_)->OnCreate();
+
+	while (Process() && window_->Run() && graphics_->Run());
 
 	return true;
 }
 
-
 const bool SeedEngine::Finalize()
 {
 	delete current_scene_;
-	
+	delete next_scene_;
+
 	auto ret = graphics_->Finalize() && window_->Finalize();
 
 	delete graphics_;
@@ -48,4 +51,38 @@ Graphics * const SeedEngine::graphics(void)
 Window * const SeedEngine::window(void)
 {
 	return window_;
+}
+
+const bool SeedEngine::Process(void)
+{
+	auto & current = (*current_scene_);
+	auto & next = (*next_scene_);
+
+	if (*current)
+	{
+		current->OnUpdate();
+		current->UpdateComponents();
+		current->UpdateChildren();
+	}
+
+	if (*next)
+	{
+		if (*current)
+		{
+			current->destroy();
+		}
+		else
+		{
+			std::swap(current, next);
+			current->set_self(current);
+			current->OnCreate();
+		}
+	}
+	else
+	{
+		if (!*current)
+			return false;
+	}
+
+	return true;
 }

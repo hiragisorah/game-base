@@ -125,9 +125,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="dx11helper.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="renderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="dx11helper.cpp" />
     <ClCompile Include="graphics.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
