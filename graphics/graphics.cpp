@@ -56,6 +56,13 @@ public:
 		this->context_->ClearDepthStencilView(dsv_[render_target].Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
 	}
 
+	// ビューポート
+public:
+	void SetViewPort(const VIEWPORT_TYPE & view_port)
+	{
+		this->context_->RSSetViewports(1, &this->viewport_[view_port]);
+	}
+
 	// シェーダ
 public:
 	void LoadShader(const SHADER_TYPE & shader_type, const std::string &  file_name)
@@ -232,8 +239,6 @@ private:
 		vp.TopLeftX = 0.f;
 		vp.TopLeftY = 0.f;
 
-		this->context_->RSSetViewports(1, &vp);
-
 		return true;
 	}
 
@@ -311,6 +316,11 @@ void Graphics::SetRenderTarget(const RENDER_TARGET & render_target)
 void Graphics::ClearRenderTarget(const RENDER_TARGET & render_target)
 {
 	this->impl_->ClearRenderTarget(render_target);
+}
+
+void Graphics::SetViewPort(const VIEWPORT_TYPE & view_port)
+{
+	this->impl_->SetViewPort(view_port);
 }
 
 void Graphics::LoadShader(const SHADER_TYPE & shader_type, const std::string & file_name)

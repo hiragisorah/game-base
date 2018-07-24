@@ -29,6 +29,10 @@ public:
 	void SetRenderTarget(const RENDER_TARGET & render_target);
 	void ClearRenderTarget(const RENDER_TARGET & render_target);
 
+	// ビューポート
+public:
+	void SetViewPort(const VIEWPORT_TYPE & view_port);
+
 	// シェーダ
 public:
 	void LoadShader(const SHADER_TYPE & shader_type, const std::string & file_name);

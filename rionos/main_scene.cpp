@@ -36,6 +36,7 @@ void MainScene::OnUpdate(void)
 	cbuffer.view_port_.x = 1280.f;
 	cbuffer.view_port_.y = 720.f;
 
+	SeedEngine::graphics()->SetViewPort(VIEWPORT_TYPE::DEFAULT);
 	SeedEngine::graphics()->SetRenderTarget(RENDER_TARGET::BACK_BUFFER);
 	SeedEngine::graphics()->ClearRenderTarget(RENDER_TARGET::BACK_BUFFER);
 
