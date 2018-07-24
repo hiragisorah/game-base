@@ -1,5 +1,5 @@
-#include "second_scene.h"
-#include "main_scene.h"
+#include "second-scene.h"
+#include "main-scene.h"
 
 #include "..\seed-engine\seed-engine.h"
 

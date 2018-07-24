@@ -1,5 +1,5 @@
-#include "main_scene.h"
-#include "second_scene.h"
+#include "main-scene.h"
+#include "second-scene.h"
 
 #include "obj1.h"
 #include "..\seed-engine\seed-engine.h"
@@ -8,29 +8,25 @@
 
 struct CBUFFER
 {
-	__declspec(align(16)) DirectX::XMMATRIX world_;
-	__declspec(align(16)) DirectX::XMFLOAT2A view_port_;
+	DirectX::XMMATRIX world_;
+	DirectX::XMFLOAT2A view_port_;
 };
 
 void MainScene::OnCreate(void)
 {
 	SeedEngine::graphics()->LoadShader(SHADER_TYPE::_DEFAULT, "../resource/shader/default.hlsl");
 	SeedEngine::graphics()->LoadGeometry(GEOMETRY_TYPE::_POINT, "");
-	std::cout << __FUNCTION__ << std::endl;
+
 	this->create_child<Obj1>();
 }
 
 void MainScene::OnUpdate(void)
 {
-	static int n = 0;
-	if (++n > 200)
-	{
-		//SeedEngine::ChangeScene<SecondScene>();
-		n = 0;
-	}
-	/*if (n % 10 == 0)
-		std::cout << __FUNCTION__ << std::endl;
-*/
+
+}
+
+void MainScene::OnRender(void)
+{
 	CBUFFER cbuffer;
 	cbuffer.world_ = DirectX::XMMatrixIdentity();
 	cbuffer.view_port_.x = 1280.f;
@@ -45,4 +41,9 @@ void MainScene::OnUpdate(void)
 	SeedEngine::graphics()->Draw(GEOMETRY_TYPE::_POINT);
 
 	SeedEngine::graphics()->Present(SYNC_INTERVAL::LIMITED);
+}
+
+void MainScene::OnDestroy(void)
+{
+
 }

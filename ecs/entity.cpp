@@ -28,10 +28,10 @@ namespace ECS
 	}
 	void Entity::destroy(void)
 	{
-		this->OnDestroyed();
+		this->OnDestroy();
 		(*this->self_)->remove();
 	}
-	void Entity::UpdateComponents(void)
+	void Entity::ComponentsUpdate(void)
 	{
 		for (auto itr = this->components_.begin(); itr != this->components_.end();)
 		{
@@ -48,7 +48,7 @@ namespace ECS
 			}
 		}
 	}
-	void Entity::UpdateChildren(void)
+	void Entity::ChildrenUpdate(void)
 	{
 		for (auto n = 0U; n < this->children_.size();)
 		{
@@ -56,8 +56,44 @@ namespace ECS
 			if (*child)
 			{
 				child->OnUpdate();
-				child->UpdateComponents();
-				child->UpdateChildren();
+				child->ComponentsUpdate();
+				child->ChildrenUpdate();
+				++n;
+			}
+			else
+			{
+				auto next_itr = this->children_.erase(this->children_.begin() + n);
+				n = std::distance(this->children_.begin(), next_itr);
+			}
+		}
+	}
+	void Entity::ComponentsRender(void)
+	{
+		for (auto itr = this->components_.begin(); itr != this->components_.end();)
+		{
+			auto & component_map = (*itr);
+			if (*component_map.second)
+			{
+				component_map.second->OnRender();
+				++itr;
+			}
+			else
+			{
+				component_map.second->OnRemove();
+				itr = this->components_.erase(itr);
+			}
+		}
+	}
+	void Entity::ChildrenRender(void)
+	{
+		for (auto n = 0U; n < this->children_.size();)
+		{
+			auto & child = this->children_[n];
+			if (*child)
+			{
+				child->OnRender();
+				child->ComponentsRender();
+				child->ChildrenRender();
 				++n;
 			}
 			else
@@ -73,7 +109,10 @@ namespace ECS
 	void Entity::OnUpdate(void)
 	{
 	}
-	void Entity::OnDestroyed(void)
+	void Entity::OnRender(void)
+	{
+	}
+	void Entity::OnDestroy(void)
 	{
 	}
 }

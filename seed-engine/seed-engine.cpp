@@ -61,8 +61,12 @@ const bool SeedEngine::Process(void)
 	if (*current)
 	{
 		current->OnUpdate();
-		current->UpdateComponents();
-		current->UpdateChildren();
+		current->ComponentsUpdate();
+		current->ChildrenUpdate();
+
+		current->OnRender();
+		current->ComponentsRender();
+		current->ChildrenRender();
 	}
 
 	if (*next)

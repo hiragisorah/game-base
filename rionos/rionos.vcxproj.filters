@@ -19,27 +19,38 @@
     <Filter Include="ヘッダー ファイル\game_object">
       <UniqueIdentifier>{63b88f3d-1fee-42d5-b4f4-e92428c4bbc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\component">
+      <UniqueIdentifier>{809cba01-cd18-428e-b28e-a72d45cb5dc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="second_scene.cpp">
+    <ClCompile Include="second-scene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="main_scene.cpp">
+    <ClCompile Include="main-scene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main_scene.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="second_scene.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
     <ClInclude Include="obj1.h">
       <Filter>ヘッダー ファイル\game_object</Filter>
     </ClInclude>
+    <ClInclude Include="second-scene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="main-scene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering-system.h">
+      <Filter>ヘッダー ファイル\component</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\resource\shader\default.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -97,9 +97,6 @@ public:
 	}
 	void UpdateConstantBuffer(const SHADER_TYPE & shader_type, void * constant_buffer, const unsigned int & buffer_num)
 	{
-		shader_type;
-		constant_buffer;
-		buffer_num;
 		this->context_->UpdateSubresource(this->shader_[shader_type].constant_buffers_[buffer_num].Get(), 0, nullptr, constant_buffer, 0U, 0U);
 	}
 	void UnloadShader(const SHADER_TYPE & shader_type)

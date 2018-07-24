@@ -21,6 +21,7 @@ namespace ECS
 	public:
 		virtual void OnAdd(void);
 		virtual void OnUpdate(void);
+		virtual void OnRender(void);
 		virtual void OnRemove(void);
 
 	public:

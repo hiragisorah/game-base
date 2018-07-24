@@ -1,5 +1,5 @@
 #include "..\seed-engine\seed-engine.h"
-#include "main_scene.h"
+#include "main-scene.h"
 
 #define WIN32_LEAD_AND_MEAN
 #include <Windows.h>
@@ -20,7 +20,6 @@ int main(void)
 int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 #endif
-
 
 	return !SeedEngine::Initialize<MainScene>() || !SeedEngine::Run() || !SeedEngine::Finalize();
 }

@@ -11,7 +11,7 @@ private:
 		std::cout << __FUNCTION__ << std::endl;
 	}
 	void OnUpdate(void) override;
-	void OnDestroyed(void) override
+	void OnDestroy(void) override
 	{
 		std::cout << __FUNCTION__ << std::endl;
 	}

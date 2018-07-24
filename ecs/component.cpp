@@ -16,6 +16,9 @@ namespace ECS
 	void Component::OnUpdate(void)
 	{
 	}
+	void Component::OnRender(void)
+	{
+	}
 	void Component::OnRemove(void)
 	{
 	}

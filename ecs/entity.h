@@ -71,12 +71,15 @@ namespace ECS
 		void destroy(void);
 
 	public:
-		void UpdateComponents(void);
-		void UpdateChildren(void);
+		void ComponentsUpdate(void);
+		void ChildrenUpdate(void);
+		void ComponentsRender(void);
+		void ChildrenRender(void);
 
 	public:
 		virtual void OnCreate(void);
 		virtual void OnUpdate(void);
-		virtual void OnDestroyed(void);
+		virtual void OnRender(void);
+		virtual void OnDestroy(void);
 	};
 }
