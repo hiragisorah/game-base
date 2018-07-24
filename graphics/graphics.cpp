@@ -7,6 +7,7 @@
 #include <DirectXMath.h>
 
 #include <unordered_map>
+#include <vector>
 
 #include "dx11helper.h"
 
@@ -47,12 +48,12 @@ public:
 public:
 	void SetRenderTarget(const RENDER_TARGET & render_target)
 	{
-		this->context_->OMSetRenderTargets(1, this->rtv_[RENDER_TARGET::BACK_BUFFER].GetAddressOf(), this->dsv_[RENDER_TARGET::BACK_BUFFER].Get());
+		this->context_->OMSetRenderTargets(1, this->rtv_[render_target].GetAddressOf(), this->dsv_[render_target].Get());
 	}
 	void ClearRenderTarget(const RENDER_TARGET & render_target)
 	{
-		this->context_->ClearRenderTargetView(rtv_[RENDER_TARGET::BACK_BUFFER].Get(), (float*)&clear_color_);
-		this->context_->ClearDepthStencilView(dsv_[RENDER_TARGET::BACK_BUFFER].Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
+		this->context_->ClearRenderTargetView(rtv_[render_target].Get(), (float*)&clear_color_);
+		this->context_->ClearDepthStencilView(dsv_[render_target].Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
 	}
 
 	// シェーダ
@@ -72,15 +73,27 @@ public:
 		this->context_->PSSetShader(shader.pixel_shader_.Get(), nullptr, 0);
 
 		this->context_->IASetInputLayout(shader.input_layout_.Get());
-		this->context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		auto buffer_cnt = shader.constant_buffers_.size();
 
-		this->context_->VSSetConstantBuffers(0, buffer_cnt, shader.constant_buffers_[0].GetAddressOf());
-		this->context_->GSSetConstantBuffers(0, buffer_cnt, shader.constant_buffers_[0].GetAddressOf());
-		this->context_->HSSetConstantBuffers(0, buffer_cnt, shader.constant_buffers_[0].GetAddressOf());
-		this->context_->DSSetConstantBuffers(0, buffer_cnt, shader.constant_buffers_[0].GetAddressOf());
-		this->context_->PSSetConstantBuffers(0, buffer_cnt, shader.constant_buffers_[0].GetAddressOf());
+		for (auto n = 0U; n < buffer_cnt; ++n)
+		{
+			if (shader.constant_buffers_[n])
+			{
+				this->context_->VSSetConstantBuffers(n, 1, shader.constant_buffers_[n].GetAddressOf());
+				this->context_->GSSetConstantBuffers(n, 1, shader.constant_buffers_[n].GetAddressOf());
+				this->context_->HSSetConstantBuffers(n, 1, shader.constant_buffers_[n].GetAddressOf());
+				this->context_->DSSetConstantBuffers(n, 1, shader.constant_buffers_[n].GetAddressOf());
+				this->context_->PSSetConstantBuffers(n, 1, shader.constant_buffers_[n].GetAddressOf());
+			}
+		}
+	}
+	void UpdateConstantBuffer(const SHADER_TYPE & shader_type, void * constant_buffer, const unsigned int & buffer_num)
+	{
+		shader_type;
+		constant_buffer;
+		buffer_num;
+		this->context_->UpdateSubresource(this->shader_[shader_type].constant_buffers_[buffer_num].Get(), 0, nullptr, constant_buffer, 0U, 0U);
 	}
 	void UnloadShader(const SHADER_TYPE & shader_type)
 	{
@@ -89,20 +102,69 @@ public:
 
 	// ジオメトリ
 public:
+	void LoadGeometry(const GEOMETRY_TYPE & geometry_type, const std::string & file_name)
+	{
+		struct XX
+		{
+			XX(
+				const DirectX::XMFLOAT3 & pos,
+				const DirectX::XMFLOAT2 & uv
+			)
+				: pos(pos)
+				, uv(uv)
+			{}
+
+			DirectX::XMFLOAT3 pos;
+			DirectX::XMFLOAT2 uv;
+		};
+
+		file_name;
+		{
+			std::vector<XX> vertices;
+
+			vertices.emplace_back(DirectX::XMFLOAT3(-50, 50, 0), DirectX::XMFLOAT2(0,0));
+			vertices.emplace_back(DirectX::XMFLOAT3(50, 50, 0), DirectX::XMFLOAT2(0, 0));
+			vertices.emplace_back(DirectX::XMFLOAT3(-50, -50, 0), DirectX::XMFLOAT2(0, 0));
+			vertices.emplace_back(DirectX::XMFLOAT3(50, -50, 0), DirectX::XMFLOAT2(0, 0));
+
+			Dx11Helper::CreateVertexBuffer(this->device_, vertices, this->vertex_buffer_[geometry_type], this->stride_[geometry_type], this->vertex_cnt_[geometry_type]);
+		}
+
+		{
+			std::vector<unsigned int> indices;
+
+			indices.emplace_back(0);
+			indices.emplace_back(1);
+			indices.emplace_back(2);
+			indices.emplace_back(3);
+			
+			Dx11Helper::CreateIndexBuffer(this->device_, indices, this->index_buffer_[geometry_type], this->index_cnt_[geometry_type]);
+		}
+
+		this->topology_[geometry_type] = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+	}
 	void Draw(const GEOMETRY_TYPE & geometry_type)
 	{
-		this->context_->IASetVertexBuffers(0, 1, this->vertex_buffer_[geometry_type].GetAddressOf(), &this->strides_[geometry_type], 0);
 		this->context_->IASetPrimitiveTopology(this->topology_[geometry_type]);
-
-		this->context_->Draw(this->vertex_cnt_[geometry_type], 0);
+		unsigned int offset = 0;
+		this->context_->IASetVertexBuffers(0, 1, this->vertex_buffer_[geometry_type].GetAddressOf(), &this->stride_[geometry_type], &offset);
+		if (this->index_buffer_[geometry_type])
+		{
+			this->context_->IASetIndexBuffer(this->index_buffer_[geometry_type].Get(), DXGI_FORMAT_R32_UINT, 0);
+			this->context_->DrawIndexed(this->index_cnt_[geometry_type], 0, 0);
+		}
+		else
+		{
+			this->context_->Draw(this->vertex_cnt_[geometry_type], 0);
+		}
 	}
-	void DrawIndexed(const GEOMETRY_TYPE & geometry_type)
+	void UnloadGeometry(const GEOMETRY_TYPE & geometry_type)
 	{
-		this->context_->IASetVertexBuffers(0, 1, this->vertex_buffer_[geometry_type].GetAddressOf(), &this->strides_[geometry_type], 0);
-		this->context_->IASetIndexBuffer(this->index_buffer_[geometry_type].Get(), DXGI_FORMAT_R32_UINT, 0);
-		this->context_->IASetPrimitiveTopology(this->topology_[geometry_type]);
-
-		this->context_->DrawIndexed(this->index_cnt_[geometry_type], 0, 0);
+		this->vertex_buffer_.erase(geometry_type);
+		this->stride_.erase(geometry_type);
+		this->vertex_cnt_.erase(geometry_type);
+		this->index_buffer_.erase(geometry_type);
+		this->index_cnt_.erase(geometry_type);
 	}
 
 private:
@@ -170,6 +232,8 @@ private:
 		vp.TopLeftX = 0.f;
 		vp.TopLeftY = 0.f;
 
+		this->context_->RSSetViewports(1, &vp);
+
 		return true;
 	}
 
@@ -188,9 +252,9 @@ private:
 	}
 
 private:
-	ComPtr<IDXGISwapChain> swap_chain_;
 	ComPtr<ID3D11Device> device_;
 	ComPtr<ID3D11DeviceContext> context_;
+	ComPtr<IDXGISwapChain> swap_chain_;
 
 	DirectX::XMFLOAT4 clear_color_;
 
@@ -207,7 +271,7 @@ private:
 	std::unordered_map<GEOMETRY_TYPE, ComPtr<ID3D11Buffer>> index_buffer_;
 
 	std::unordered_map<GEOMETRY_TYPE, ComPtr<ID3D11Buffer>> vertex_buffer_;
-	std::unordered_map<GEOMETRY_TYPE, unsigned int> strides_;
+	std::unordered_map<GEOMETRY_TYPE, unsigned int> stride_;
 	std::unordered_map<GEOMETRY_TYPE, unsigned int> vertex_cnt_;
 	std::unordered_map<GEOMETRY_TYPE, unsigned int> index_cnt_;
 
@@ -232,11 +296,6 @@ bool Graphics::Initalize(void)
 bool Graphics::Finalize(void)
 {
 	return this->impl_->Finalize();
-}
-
-void Graphics::ClearRenderTarget(const RENDER_TARGET & render_target)
-{
-	this->impl_->ClearRenderTarget(render_target);
 }
 
 void Graphics::Present(const SYNC_INTERVAL & sync_interval)
@@ -264,8 +323,9 @@ void Graphics::SetupShader(const SHADER_TYPE & shader_type)
 	this->impl_->SetupShader(shader_type);
 }
 
-void Graphics::UpdateConstantBuffer(void * constant_buffer, const unsigned int & buffer_num)
+void Graphics::UpdateConstantBuffer(const SHADER_TYPE & shader_type, void * constant_buffer, const unsigned int & buffer_num)
 {
+	this->impl_->UpdateConstantBuffer(shader_type, constant_buffer, buffer_num);
 }
 
 void Graphics::UnloadShader(const SHADER_TYPE & shader_type)
@@ -273,12 +333,17 @@ void Graphics::UnloadShader(const SHADER_TYPE & shader_type)
 	this->impl_->UnloadShader(shader_type);
 }
 
+void Graphics::LoadGeometry(const GEOMETRY_TYPE & geometry_type, const std::string & file_name)
+{
+	this->impl_->LoadGeometry(geometry_type, file_name);
+}
+
 void Graphics::Draw(const GEOMETRY_TYPE & geometry_type)
 {
 	this->impl_->Draw(geometry_type);
 }
 
-void Graphics::DrawIndexed(const GEOMETRY_TYPE & geometry_type)
+void Graphics::UnloadGeometry(const GEOMETRY_TYPE & geometry_type)
 {
-	this->impl_->DrawIndexed(geometry_type);
+	this->impl_->UnloadGeometry(geometry_type);
 }

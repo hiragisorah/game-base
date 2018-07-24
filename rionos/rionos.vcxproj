@@ -125,6 +125,9 @@
     <ProjectReference Include="..\ecs\ecs.vcxproj">
       <Project>{1091de8a-49c8-4d23-9be3-ab4907ae4a94}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\graphics\graphics.vcxproj">
+      <Project>{8775c033-85ba-4b8a-88c8-9efa4af75936}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\seed-engine\seed-engine.vcxproj">
       <Project>{05af85eb-1703-4346-9e0e-62b1a23440ba}</Project>
     </ProjectReference>

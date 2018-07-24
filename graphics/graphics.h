@@ -33,16 +33,17 @@ public:
 public:
 	void LoadShader(const SHADER_TYPE & shader_type, const std::string & file_name);
 	void SetupShader(const SHADER_TYPE & shader_type);
-	void UpdateConstantBuffer(void * constant_buffer, const unsigned int & buffer_num);
+	void UpdateConstantBuffer(const SHADER_TYPE & shader_type, void * constant_buffer, const unsigned int & buffer_num);
 	void UnloadShader(const SHADER_TYPE & shader_type);
 	
 	// ÉWÉIÉÅÉgÉä
 public:
+	void LoadGeometry(const GEOMETRY_TYPE & geometry_type, const std::string & file_name);
 	void Draw(const GEOMETRY_TYPE & geometry_type);
-	void DrawIndexed(const GEOMETRY_TYPE & geometry_type);
+	void UnloadGeometry(const GEOMETRY_TYPE & geometry_type);
 
 	// âBï¡é¿ëï
 private:
 	class Impl;
-	Impl * impl_;
+	Impl * impl_ = nullptr;
 };

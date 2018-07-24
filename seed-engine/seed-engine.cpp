@@ -25,7 +25,7 @@ const bool SeedEngine::Run()
 	(*current_scene_)->set_self(*current_scene_);
 	(*current_scene_)->OnCreate();
 
-	while (Process() && window_->Run() && graphics_->Run());
+	while (Process() && window_->Run());
 
 	return true;
 }

@@ -20,7 +20,7 @@ static DXGI_FORMAT GetDxgiFormat(
 	BYTE mask
 );
 
-void Dx11Helper::LoadShader(const Microsoft::WRL::ComPtr<ID3D11Device>& device, const std::string & file_name, Dx11Shader shader)
+void Dx11Helper::LoadShader(const Microsoft::WRL::ComPtr<ID3D11Device>& device, const std::string & file_name, Dx11Shader & shader)
 {
 	ID3DBlob * blob = nullptr;
 	ID3DBlob * error = nullptr;
@@ -29,9 +29,9 @@ void Dx11Helper::LoadShader(const Microsoft::WRL::ComPtr<ID3D11Device>& device, 
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_5_0", SHADER_FLAGS, 0, &blob, &error)))
 	{
 		if (error != nullptr)
-			std::cout << __FUNCTION__ << " " << (char*)error->GetBufferPointer() << std::endl;
+			std::cout << __FUNCTION__ << "::" << (char*)error->GetBufferPointer() << std::endl;
 		else
-			std::cout << __FUNCTION__ << " シェーダーの読み込みに失敗しました。" << std::endl;
+			std::cout << __FUNCTION__ << "::シェーダーの読み込みに失敗しました。" << std::endl;
 
 		return;
 	}
